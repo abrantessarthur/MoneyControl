@@ -33,7 +33,7 @@ public class MonthlyBudgetService {
         CategoryEntity category = categoryRepository
                 .findById(request.categoryId())
                 .orElseThrow(() ->
-                        new NotFoundException("Categoria não encontrada")
+                        new NotFoundException("Category not found")
                 );
 
         UserEntity user = (UserEntity) authentication.getPrincipal();
@@ -65,7 +65,7 @@ public class MonthlyBudgetService {
         MonthlyBudgetEntity budget = budgetRepository
                 .findByIdAndUserId(budgetId, user.getId())
                 .orElseThrow(() ->
-                        new NotFoundException("Orçamento não encontrado")
+                        new NotFoundException("Budget not found")
                 );
 
         LocalDateTime startDate = budget.getMonth()

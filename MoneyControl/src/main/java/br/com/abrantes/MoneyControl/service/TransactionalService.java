@@ -39,7 +39,7 @@ public class TransactionalService {
         CategoryEntity category = categoryRepository
                 .findById(request.categoryId())
                 .orElseThrow(() ->
-                        new RuntimeException("Categoria não encontrada")
+                        new RuntimeException("Category not found")
                 );
 
         TransactionEntity transaction = TransactionEntity.builder()

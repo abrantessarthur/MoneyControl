@@ -18,9 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Set;
-
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +57,7 @@ public class AuthenticationService {
 
             return new TokenResponseDTO(token, expirationTime);
         } catch (BadCredentialsException e) {
-            throw new BadRequestException("E-mail or password invalids");
+            throw new BadRequestException("E-mail or password invalid");
         }
     }
 
