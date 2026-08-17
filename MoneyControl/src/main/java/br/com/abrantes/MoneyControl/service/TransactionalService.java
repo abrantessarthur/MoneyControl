@@ -6,16 +6,20 @@ import br.com.abrantes.MoneyControl.dto.response.TransactionResponse;
 import br.com.abrantes.MoneyControl.dto.response.UpdateTransactionResponse;
 import br.com.abrantes.MoneyControl.entity.CategoryEntity;
 import br.com.abrantes.MoneyControl.entity.TransactionEntity;
+import br.com.abrantes.MoneyControl.entity.UserEntity;
 import br.com.abrantes.MoneyControl.exception.NotFoundException;
 import br.com.abrantes.MoneyControl.repository.CategoryRepository;
 import br.com.abrantes.MoneyControl.repository.TransactionRepository;
+import br.com.abrantes.MoneyControl.repository.TransactionSummary;
 import br.com.abrantes.MoneyControl.repository.TransactionsProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -25,7 +29,13 @@ public class TransactionalService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
 
-    public TransactionResponse create(CreateTransactionRequest request) {
+
+    public TransactionResponse create(
+            CreateTransactionRequest request,
+            Authentication authentication
+    ) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+
         CategoryEntity category = categoryRepository
                 .findById(request.categoryId())
                 .orElseThrow(() ->
@@ -37,6 +47,7 @@ public class TransactionalService {
                 .amount(request.amount())
                 .typeTransactional(request.typeTransactional())
                 .category(category)
+                .user(user)
                 .date(
                         request.date() != null
                                 ? request.date()
@@ -100,4 +111,15 @@ public class TransactionalService {
                 .stream()
                 .findFirst();
     }
+
+    public BigDecimal getBalance(Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return transactionRepository.calculateBalance(user.getId());
+    }
+
+    public TransactionSummary getSumary(){
+        return transactionRepository.getSumary();
+    }
+
+
 }

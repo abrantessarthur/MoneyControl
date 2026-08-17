@@ -2,9 +2,11 @@ package br.com.abrantes.MoneyControl.config;
 
 import br.com.abrantes.MoneyControl.dto.request.LoginRequest;
 import br.com.abrantes.MoneyControl.dto.request.RegisterRequest;
+import br.com.abrantes.MoneyControl.dto.response.TokenResponseDTO;
 import br.com.abrantes.MoneyControl.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +25,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public void register(@RequestBody @Valid LoginRequest login) throws Exception {
-        authenticationService.login(login);
+    public ResponseEntity<TokenResponseDTO> login(
+            @RequestBody @Valid LoginRequest request
+    ) {
+        return ResponseEntity.ok(
+                authenticationService.login(request)
+        );
     }
 }

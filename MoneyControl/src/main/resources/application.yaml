@@ -1,3 +1,22 @@
 spring:
   application:
     name: MoneyControl
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/moneyControl?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo}
+    username: arthur
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+jwt:
+  expiration: ${JWT_EXPIRATION:900000}
+  key: ${JWT_KEY:money-control-local-jwt-secret-key-2026}

@@ -7,10 +7,10 @@ import br.com.abrantes.MoneyControl.dto.response.TokenResponseDTO;
 import br.com.abrantes.MoneyControl.entity.RolesEntity;
 import br.com.abrantes.MoneyControl.entity.UserEntity;
 import br.com.abrantes.MoneyControl.enums.RoleTypeEnum;
+import br.com.abrantes.MoneyControl.exception.BadRequestException;
 import br.com.abrantes.MoneyControl.repository.RolesRepository;
 import br.com.abrantes.MoneyControl.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,9 +37,8 @@ public class AuthenticationService {
         UserEntity user = userRepository.findByEmail(registerRequest.email())
                 .orElse(null);
         if (user != null) {
-            throw new BadRequestException("");
+            throw new BadRequestException("E-mail already in use");
         }
-
         RolesEntity role = rolesRepository.findByName(RoleTypeEnum.ROLE_USER.name())
                 .orElseGet(()-> rolesRepository.save(RolesEntity.builder().name(RoleTypeEnum.ROLE_USER.name()).build()));
 
@@ -60,7 +59,7 @@ public class AuthenticationService {
 
             return new TokenResponseDTO(token, expirationTime);
         } catch (BadCredentialsException e) {
-            throw new BadRequestException("");
+            throw new BadRequestException("E-mail or password invalids");
         }
     }
 

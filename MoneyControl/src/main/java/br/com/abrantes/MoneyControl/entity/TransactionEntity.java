@@ -37,6 +37,10 @@ public class TransactionEntity {
     @Column(nullable = false)
     private LocalDateTime date;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
     @PrePersist
     public void prePersist() {
         if (date == null) {

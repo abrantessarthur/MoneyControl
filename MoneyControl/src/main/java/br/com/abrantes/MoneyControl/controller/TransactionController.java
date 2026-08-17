@@ -4,6 +4,7 @@ import br.com.abrantes.MoneyControl.dto.request.CreateTransactionRequest;
 import br.com.abrantes.MoneyControl.dto.request.UpdateTransactionRequest;
 import br.com.abrantes.MoneyControl.dto.response.TransactionResponse;
 import br.com.abrantes.MoneyControl.dto.response.UpdateTransactionResponse;
+import br.com.abrantes.MoneyControl.repository.TransactionSummary;
 import br.com.abrantes.MoneyControl.repository.TransactionsProjection;
 import br.com.abrantes.MoneyControl.service.TransactionalService;
 import jakarta.transaction.Transactional;
@@ -12,17 +13,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/transactions")
 public class TransactionController {
     private final TransactionalService transactionService;
 
     @PostMapping
     @Transactional
-    public ResponseEntity<TransactionResponse> createTransaction(@Valid @RequestBody CreateTransactionRequest createTransactionRequest) {
-        TransactionResponse created = transactionService.create(createTransactionRequest);
+    public ResponseEntity<TransactionResponse> createTransaction(
+            @Valid @RequestBody CreateTransactionRequest createTransactionRequest,
+            Authentication authentication
+    ) {
+        TransactionResponse created = transactionService.create(
+                createTransactionRequest,
+                authentication
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -51,4 +62,19 @@ public class TransactionController {
                 .map(transaction -> ResponseEntity.ok(transaction))
                 .orElse(ResponseEntity.noContent().build());
     }
+
+    @GetMapping("/balance")
+    public ResponseEntity<BigDecimal> getBalance(
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                transactionService.getBalance(authentication)
+        );
+    }
+
+    @GetMapping("/sumary")
+    public TransactionSummary getSumary(){
+        return transactionService.getSumary();
+    }
+
 }
