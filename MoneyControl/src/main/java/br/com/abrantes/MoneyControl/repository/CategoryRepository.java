@@ -10,7 +10,7 @@ public interface CategoryRepository extends CrudRepository<CategoryEntity, Long>
     @NativeQuery
             (value = """
             SELECT c.id as id,
-                   c.name as name,
+                   c.name as name
             FROM categorys c
             
 """,

@@ -7,6 +7,7 @@ import br.com.abrantes.MoneyControl.dto.response.UpdateTransactionResponse;
 import br.com.abrantes.MoneyControl.entity.CategoryEntity;
 import br.com.abrantes.MoneyControl.entity.TransactionEntity;
 import br.com.abrantes.MoneyControl.entity.UserEntity;
+import br.com.abrantes.MoneyControl.exception.BadRequestException;
 import br.com.abrantes.MoneyControl.exception.NotFoundException;
 import br.com.abrantes.MoneyControl.repository.CategoryRepository;
 import br.com.abrantes.MoneyControl.repository.TransactionRepository;
@@ -39,8 +40,12 @@ public class TransactionalService {
         CategoryEntity category = categoryRepository
                 .findById(request.categoryId())
                 .orElseThrow(() ->
-                        new RuntimeException("Category not found")
+                        new NotFoundException("Category not found")
                 );
+
+        if (request.amount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Amount must be greater than zero");
+        }
 
         TransactionEntity transaction = TransactionEntity.builder()
                 .description(request.description())
