@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.NativeQuery;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<UserEntity, Integer> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
     Optional<UserEntity> findByToken(String token);
 
