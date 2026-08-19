@@ -1,5 +1,6 @@
 package br.com.abrantes.MoneyControl.dto.response;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record InstallmentPlanResponse(
@@ -7,7 +8,8 @@ public record InstallmentPlanResponse(
         String description,
         Integer totalInstallments,
         LocalDate firstDueDate,
-        Long categoryId
+        Long categoryId,
+        BigDecimal totalAmount
 ) {
 
 }
