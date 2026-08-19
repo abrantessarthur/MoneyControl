@@ -41,6 +41,12 @@ public class TransactionEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @ManyToOne
+    @JoinColumn(name = "installment_plan_id")
+    private InstallmentPlanEntity installmentPlan;
+
+    private Integer installmentNumber;
+
     @PrePersist
     public void prePersist() {
         if (date == null) {
