@@ -11,17 +11,15 @@ public interface InstallmentPlanRepository extends JpaRepository<InstallmentPlan
             (value = """
             SELECT i.id as id,
                    i.description as description,
-                   i.amount as amount,
-                   i.type_transactional as typeTransactional,
-                   c.id as categoryId,
-                   c.name as categoryName,
-                   i.date as date
-            FROM installments t
-            INNER JOIN categorys c ON c.id = t.category_id
+                   i.total_amount as totalAmount,
+                   i.total_installments as totalInstallments,
+                   c.id as categoryId
+            FROM installment_plans i
+            INNER JOIN categorys c ON c.id = i.category_id
 """,
                     countQuery = """
                     SELECT COUNT(*)
-                    FROM installments_plans i
+                    FROM installment_plans i
 """
             )
     Page<InstallmenPlanProjection> getInstallmentsPage(Pageable pageable);

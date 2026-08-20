@@ -4,6 +4,7 @@ import br.com.abrantes.MoneyControl.dto.request.InstallmentPlanRequest;
 import br.com.abrantes.MoneyControl.dto.response.InstallmentPlanResponse;
 import br.com.abrantes.MoneyControl.repository.InstallmenPlanProjection;
 import br.com.abrantes.MoneyControl.service.InstallmentPlanService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,8 @@ public class InstallmentsPlanController {
     private final InstallmentPlanService installmentPlanService;
 
     @PostMapping
-    public ResponseEntity<InstallmentPlanResponse> create(InstallmentPlanRequest installmentPlanRequest, Authentication authentication) {
+    public ResponseEntity<InstallmentPlanResponse> create(@Valid @RequestBody InstallmentPlanRequest installmentPlanRequest,
+                                                          Authentication authentication) {
         installmentPlanService.create(installmentPlanRequest, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -31,7 +33,7 @@ public class InstallmentsPlanController {
     }
 
     @GetMapping("/page/{page}/size/{size}")
-    public Page<InstallmenPlanProjection> getInstallmentPage(Integer page, Integer size){
+    public Page<InstallmenPlanProjection> getInstallmentPage(@PathVariable Integer page, @PathVariable Integer size){
         return  installmentPlanService.getInstallmentPage(page, size);
     }
 }
