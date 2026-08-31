@@ -1,9 +1,12 @@
 package br.com.abrantes.MoneyControl.dto.response;
 
+import java.math.BigDecimal;
+
 public record CreditCardResponse(
         Long id,
+        String name,
         String lastFourDigits,
-        String creditLimit,
+        BigDecimal creditLimit,
         Integer closingDay,
         Integer dueDay
 ) {

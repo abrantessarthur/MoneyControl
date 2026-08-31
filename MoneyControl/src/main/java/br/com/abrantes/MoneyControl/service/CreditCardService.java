@@ -27,12 +27,14 @@ public class CreditCardService {
                 .dueDay(request.dueDay())
                 .closingDay(request.closingDay())
                 .lastFourDigits(request.lastFourDigits())
+                .user(user)
                 .build();
         CreditCardEntity saved = creditCardRepository.save(creditCard);
         return new CreditCardResponse(
                 saved.getId(),
-                saved.getLastFourDigits(),
                 saved.getName(),
+                saved.getLastFourDigits(),
+                saved.getCreditLimit(),
                 saved.getClosingDay(),
                 saved.getDueDay()
         );
