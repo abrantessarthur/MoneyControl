@@ -37,4 +37,15 @@ public class CreditCardService {
                 saved.getDueDay()
         );
     }
+
+    public void delete(Long id){
+        if(creditCardRepository.existsById(id)){
+             creditCardRepository.deleteById(id);
+        }else{
+            throw new IllegalArgumentException("Credit card not found");
+        }
+    }
+
+
+
 }
