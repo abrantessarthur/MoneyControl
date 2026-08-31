@@ -13,6 +13,6 @@ public class RecurrencyTransactionService {
     private final RecurrencyTransactionRepository recurrencyTransactionRepository;
 
     public RecurrencyTransactionResponse create(Authentication authentication, CreateRecurrencyTransaction create){
-
+        return null;
     }
 }

@@ -50,6 +50,7 @@ public class TransactionEntity {
     @JoinColumn(name = "recurring_transaction_id")
     private RecurringTransactionEntity recurringTransaction;
 
+    @Column(name = "recurrence_reference_date")
     private LocalDate recurrenceReferenceDate;
 
     private Integer installmentNumber;

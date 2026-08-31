@@ -21,25 +21,33 @@ public class RecurringTransactionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TypeTransactional typeTransactional;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RecurrenceFrequency frequency;
 
+    @Column(nullable = false)
     private LocalDate startDate;
 
+    @Column(nullable = false)
     private LocalDate nextExecutionDate;
 
     private LocalDate endDate;
 
     private LocalDate lastExecutionDate;
 
-    private Boolean active;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active = true;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
