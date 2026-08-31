@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,6 +45,12 @@ public class TransactionEntity {
     @ManyToOne
     @JoinColumn(name = "installment_plan_id")
     private InstallmentPlanEntity installmentPlan;
+
+    @ManyToOne
+    @JoinColumn(name = "recurring_transaction_id")
+    private RecurringTransactionEntity recurringTransaction;
+
+    private LocalDate recurrenceReferenceDate;
 
     private Integer installmentNumber;
 
