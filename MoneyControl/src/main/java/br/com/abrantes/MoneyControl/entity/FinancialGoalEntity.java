@@ -27,7 +27,11 @@ public class FinancialGoalEntity {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
+    private LocalDate initialDate;
+
     private LocalDate finalDate;
+
+    private BigDecimal amountLeft;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

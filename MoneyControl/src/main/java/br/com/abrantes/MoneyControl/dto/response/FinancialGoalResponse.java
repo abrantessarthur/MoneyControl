@@ -9,6 +9,7 @@ public record FinancialGoalResponse(
         BigDecimal amountToAchive,
         BigDecimal amount,
         LocalDate finalDate,
-        LocalDate currentDate
+        LocalDate initialDate,
+        BigDecimal amountLeft
 ) {
 }

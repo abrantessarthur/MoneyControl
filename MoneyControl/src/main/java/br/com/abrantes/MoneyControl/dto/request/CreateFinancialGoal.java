@@ -16,6 +16,8 @@ public record CreateFinancialGoal(
         @NotNull
         BigDecimal amount,
 
-        LocalDate finalDate
+        LocalDate finalDate,
+
+        LocalDate initialDate
 ) {
 }
