@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record RecurrencyTransactionResponse(
+        Long id,
         String description,
         BigDecimal amount,
         TypeTransactional typeTransactional,
@@ -17,5 +18,5 @@ public record RecurrencyTransactionResponse(
         LocalDate lastExecutionDate,
         Boolean active,
         Long categoryId
-        ) {
+) {
 }

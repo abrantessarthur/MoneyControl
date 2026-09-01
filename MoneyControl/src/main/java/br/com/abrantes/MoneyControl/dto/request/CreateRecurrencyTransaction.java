@@ -1,14 +1,10 @@
 package br.com.abrantes.MoneyControl.dto.request;
 
-import br.com.abrantes.MoneyControl.entity.CategoryEntity;
 import br.com.abrantes.MoneyControl.enums.RecurrenceFrequency;
 import br.com.abrantes.MoneyControl.enums.TypeTransactional;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,22 +14,21 @@ public record CreateRecurrencyTransaction(
         String description,
 
         @NotNull
+        @Positive
         BigDecimal amount,
 
+        @NotNull
         TypeTransactional typeTransactional,
 
+        @NotNull
         RecurrenceFrequency frequency,
 
+        @NotNull
         LocalDate startDate,
-
-        LocalDate nextExecutionDate,
 
         LocalDate endDate,
 
-         LocalDate lastExecutionDate,
-
-         Boolean active,
-
-         CategoryEntity category
+        @NotNull
+        Long categoryId
 ) {
 }

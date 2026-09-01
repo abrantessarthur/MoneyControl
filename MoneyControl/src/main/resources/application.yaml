@@ -20,3 +20,8 @@ spring:
 jwt:
   expiration: ${JWT_EXPIRATION:900000}
   key: ${JWT_KEY:money-control-local-jwt-secret-key-2026}
+
+app:
+  time-zone: America/Sao_Paulo
+  recurring-transactions:
+    cron: "0 0 2 * * *"

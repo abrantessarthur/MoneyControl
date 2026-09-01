@@ -10,10 +10,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
+
+    boolean existsByRecurringTransactionIdAndRecurrenceReferenceDate(
+            Long recurringTransactionId,
+            LocalDate recurrenceReferenceDate
+    );
+
     @NativeQuery
             (value = """
             SELECT t.id as id,
