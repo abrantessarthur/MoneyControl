@@ -42,7 +42,7 @@ public class RecurrencyTransactionService {
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
         if (request.endDate() != null && request.endDate().isBefore(request.startDate())) {
-            throw new BadRequestException("End date cannot be before start date");
+            throw new BadRequestException("End date cannot be before now");
         }
 
         RecurringTransactionEntity recurring = RecurringTransactionEntity.builder()

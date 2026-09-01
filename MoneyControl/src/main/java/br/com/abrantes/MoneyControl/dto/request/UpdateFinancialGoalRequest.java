@@ -6,15 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CreateFinancialGoal(
+public record UpdateFinancialGoalRequest(
         @NotBlank
         String description,
-
-        @NotNull
-        BigDecimal amountToAchieve,
-
         @NotNull
         BigDecimal amount,
+        @NotNull
+        BigDecimal amountToAchieve,
         @NotNull
         LocalDate finalDate
 ) {
