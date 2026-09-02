@@ -1,10 +1,7 @@
 package br.com.abrantes.MoneyControl.controller;
 
-import br.com.abrantes.MoneyControl.dto.request.CreateFinancialGoal;
-import br.com.abrantes.MoneyControl.dto.request.UpdateFinancialGoalRequest;
+import br.com.abrantes.MoneyControl.dto.request.FinancialGoalRequest;
 import br.com.abrantes.MoneyControl.dto.response.FinancialGoalResponse;
-import br.com.abrantes.MoneyControl.dto.response.UpdateFinancialGoalResponse;
-import br.com.abrantes.MoneyControl.entity.UserEntity;
 import br.com.abrantes.MoneyControl.service.FinancialGoalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -21,7 +17,7 @@ import java.util.List;
 public class FinancialGoalController {
     private final FinancialGoalService  financialGoalService;
     @PostMapping
-    public ResponseEntity<FinancialGoalResponse> create(@Valid @RequestBody CreateFinancialGoal create,
+    public ResponseEntity<FinancialGoalResponse> create(@Valid @RequestBody FinancialGoalRequest create,
                                                         Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(financialGoalService.create(authentication, create));
@@ -34,17 +30,16 @@ public class FinancialGoalController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<UpdateFinancialGoalResponse> update(Authentication authentication,
-                                                              @Valid @RequestBody UpdateFinancialGoalRequest request,
+    public ResponseEntity<FinancialGoalResponse> update(Authentication authentication,
+                                                              @Valid @RequestBody FinancialGoalRequest request,
                                                               @PathVariable Long id){
-        financialGoalService.update(authentication, request, id);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok().body(financialGoalService.update(authentication, request, id));
 
     }
 
     @GetMapping
-    public List<FinancialGoalResponse> getAll(Authentication authentication) {
-        UserEntity user = (UserEntity) authentication.getPrincipal();
+    public List<FinancialGoalResponse> findAll(Authentication authentication) {
         return financialGoalService.findAll(authentication);
     }
 }

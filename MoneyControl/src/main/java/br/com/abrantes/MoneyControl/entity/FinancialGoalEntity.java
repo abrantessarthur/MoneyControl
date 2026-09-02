@@ -19,6 +19,7 @@ public class FinancialGoalEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String description;
 
     @Column(nullable = false, precision = 15, scale = 2)
@@ -27,8 +28,9 @@ public class FinancialGoalEntity {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
+    @Column(nullable = false)
     private LocalDate initialDate;
-
+    @Column(nullable = false)
     private LocalDate finalDate;
 
     @ManyToOne
