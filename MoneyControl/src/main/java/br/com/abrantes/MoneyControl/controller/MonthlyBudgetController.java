@@ -19,25 +19,17 @@ public class MonthlyBudgetController {
     private final MonthlyBudgetService monthlyBudgetService;
 
     @PostMapping
-    public ResponseEntity<MonthlyBudgetResponse> create(
-            @Valid @RequestBody CreateMonthlyBudgetRequest request,
+    public ResponseEntity<MonthlyBudgetResponse> create(@Valid @RequestBody CreateMonthlyBudgetRequest request,
             Authentication authentication
     ) {
-        MonthlyBudgetResponse response =
-                monthlyBudgetService.create(request, authentication);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(monthlyBudgetService.create(request, authentication));
     }
 
     @GetMapping("/{budgetId}/summary")
-    public ResponseEntity<BudgetSummaryResponse> getSummary(
-            @PathVariable Long budgetId,
+    public ResponseEntity<BudgetSummaryResponse> getSummary(@PathVariable Long budgetId,
             Authentication authentication
     ) {
-        return ResponseEntity.ok(
-                monthlyBudgetService.getSummary(budgetId, authentication)
-        );
+        return ResponseEntity.ok(monthlyBudgetService.getSummary(budgetId, authentication));
     }
 }

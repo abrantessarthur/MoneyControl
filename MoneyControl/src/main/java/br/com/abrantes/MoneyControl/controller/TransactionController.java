@@ -28,11 +28,8 @@ public class TransactionController {
             @Valid @RequestBody CreateTransactionRequest createTransactionRequest,
             Authentication authentication
     ) {
-        TransactionResponse created = transactionService.create(
-                createTransactionRequest,
-                authentication
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(transactionService.create(createTransactionRequest, authentication));
     }
 
     @DeleteMapping("{id}")
@@ -45,8 +42,7 @@ public class TransactionController {
     public ResponseEntity<UpdateTransactionResponse>  updateTransaction(@PathVariable Long id,
                                                                         @Valid @RequestBody UpdateTransactionRequest updateTransactionRequest,
                                                                         Authentication authentication) {
-        UpdateTransactionResponse updated = transactionService.update(updateTransactionRequest, id, authentication);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(transactionService.update(updateTransactionRequest, id, authentication));
     }
 
     @GetMapping("/page/{page}/size/{size}")
@@ -65,9 +61,7 @@ public class TransactionController {
     public ResponseEntity<BigDecimal> getBalance(
             Authentication authentication
     ) {
-        return ResponseEntity.ok(
-                transactionService.getBalance(authentication)
-        );
+        return ResponseEntity.ok(transactionService.getBalance(authentication));
     }
 
     @GetMapping("/sumary")

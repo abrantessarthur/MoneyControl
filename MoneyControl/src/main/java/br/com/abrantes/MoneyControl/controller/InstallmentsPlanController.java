@@ -21,8 +21,9 @@ public class InstallmentsPlanController {
     @PostMapping
     public ResponseEntity<InstallmentPlanResponse> create(@Valid @RequestBody InstallmentPlanRequest installmentPlanRequest,
                                                           Authentication authentication) {
-        installmentPlanService.create(installmentPlanRequest, authentication);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(installmentPlanService.create(installmentPlanRequest, authentication));
     }
 
     @DeleteMapping("{id}")
@@ -34,7 +35,7 @@ public class InstallmentsPlanController {
     @GetMapping("/page/{page}/size/{size}")
     public Page<InstallmenPlanProjection> getInstallmentPage(@PathVariable Integer page, @PathVariable Integer size,
                                                              Authentication authentication){
-        return  installmentPlanService.getInstallmentPage(page, size, authentication);
+        return installmentPlanService.getInstallmentPage(page, size, authentication);
     }
 }
 
