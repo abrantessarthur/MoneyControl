@@ -13,6 +13,7 @@ import br.com.abrantes.MoneyControl.repository.CategoryRepository;
 import br.com.abrantes.MoneyControl.repository.TransactionRepository;
 import br.com.abrantes.MoneyControl.repository.TransactionSummary;
 import br.com.abrantes.MoneyControl.repository.TransactionsProjection;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,7 @@ public class TransactionalService {
     private final CategoryRepository categoryRepository;
 
 
+    @Transactional
     public TransactionResponse create(
             CreateTransactionRequest request,
             Authentication authentication
@@ -73,23 +75,19 @@ public class TransactionalService {
         );
     }
 
-    public void delete(Long id) {
-        if (transactionRepository.existsById(id)) {
-            transactionRepository.deleteById(id);
-        }else{
-            throw new NotFoundException("Transaction not found");
-        }
-
+    @Transactional
+    public void delete(Long id, Authentication authentication) {
+        TransactionEntity transaction = findOwnedTransaction(id, authentication);
+        transactionRepository.delete(transaction);
     }
 
+    @Transactional
     public UpdateTransactionResponse update(
             UpdateTransactionRequest request,
-            Long id
+            Long id,
+            Authentication authentication
     ) {
-        TransactionEntity transaction = transactionRepository.findById(id)
-                .orElseThrow(() ->
-                        new NotFoundException("Transaction not found")
-                );
+        TransactionEntity transaction = findOwnedTransaction(id, authentication);
 
         transaction.setDescription(request.description());
         transaction.setAmount(request.amount());
@@ -107,12 +105,14 @@ public class TransactionalService {
         );
     }
 
-    public Page<TransactionsProjection> getTransactionsPage(Integer page, Integer size){
-        return transactionRepository.getTransactionsPage(PageRequest.of(page, size));
+    public Page<TransactionsProjection> getTransactionsPage(Integer page, Integer size, Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return transactionRepository.getTransactionsPage(user.getId(), PageRequest.of(page, size));
     }
 
-    public Optional<TransactionResponse> getMostExpensiveTransaction() {
-        return transactionRepository.findMostExpensiveTransaction(PageRequest.of(0, 1))
+    public Optional<TransactionResponse> getMostExpensiveTransaction(Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return transactionRepository.findMostExpensiveTransaction(user.getId(), PageRequest.of(0, 1))
                 .stream()
                 .findFirst();
     }
@@ -122,9 +122,15 @@ public class TransactionalService {
         return transactionRepository.calculateBalance(user.getId());
     }
 
-    public TransactionSummary getSumary(){
-        return transactionRepository.getSumary();
+    public TransactionSummary getSumary(Authentication authentication){
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return transactionRepository.getSumary(user.getId());
     }
 
+    private TransactionEntity findOwnedTransaction(Long id, Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return transactionRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new NotFoundException("Transaction not found"));
+    }
 
 }

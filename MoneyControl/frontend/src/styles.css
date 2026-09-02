@@ -101,7 +101,7 @@ button:disabled { opacity: .55; cursor: wait; }
 .quick-action button:hover { background: #fff; }
 
 .split-section { display: grid; grid-template-columns: 1fr 360px; gap: 18px; }
-.recent-ledger, .budget-dial, .table-shell, .toolbar-panel, .commitment-board, .budget-board, .invoice-panel { border: 1px solid var(--line); background: var(--surface); }
+.recent-ledger, .budget-dial, .table-shell, .toolbar-panel, .commitment-board, .budget-board, .goals-board, .invoice-panel { border: 1px solid var(--line); background: var(--surface); }
 .recent-ledger { padding: 26px; }
 .section-title { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
 .section-title span { display: block; color: #6e6e6e; font: 600 9px/1 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .09em; margin-bottom: 7px; }
@@ -152,6 +152,22 @@ button:disabled { opacity: .55; cursor: wait; }
 .planning-intro .primary-button { background: #0b0b0b; color: #fff; border-color: #0b0b0b; }
 .planning-intro .outline-button { color: #111; border-color: #888; }
 .commitment-board, .budget-board { padding: 26px; }
+.goals-board { grid-column: 1 / -1; padding: 26px; }
+.goal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.goal-card { min-height: 235px; border: 1px solid var(--line); padding: 20px; display: flex; flex-direction: column; background: #0d0d0d; }
+.goal-card-head { display: flex; justify-content: space-between; align-items: center; }
+.goal-card-head > span { color: #777; font: 600 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.goal-card-head > div { display: flex; gap: 6px; }
+.goal-card-head .icon-button { width: 30px; height: 30px; }
+.goal-card-head .danger:hover { color: #fff; border-color: #777; background: #242424; }
+.goal-card h4 { margin: 25px 0 18px; font-size: 19px; font-weight: 520; letter-spacing: -.03em; }
+.goal-progress { height: 3px; background: #292929; overflow: hidden; }
+.goal-progress i { display: block; height: 100%; background: #e8e8e3; }
+.goal-values { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 17px 0 20px; }
+.goal-values span { color: #666; font-size: 8px; text-transform: uppercase; letter-spacing: .06em; }
+.goal-values strong { display: block; margin-top: 6px; color: #d6d6d1; font-size: 11px; text-transform: none; letter-spacing: 0; }
+.goal-deadline { margin-top: auto; padding-top: 13px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 20px 1fr auto; align-items: center; color: #666; font-size: 9px; }
+.goal-deadline strong { color: #aaa; font-weight: 550; }
 .commitment { display: grid; grid-template-columns: 42px 1fr 60px; align-items: center; gap: 13px; padding: 18px 0; border-top: 1px solid var(--line); }
 .commitment-index { color: #575757; font: 500 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .commitment-copy strong, .commitment-copy span { display: block; }
@@ -242,6 +258,7 @@ button:disabled { opacity: .55; cursor: wait; }
   .split-section { grid-template-columns: 1fr; }
   .budget-dial { min-height: 420px; }
   .planning-grid { grid-template-columns: 1fr; }
+  .goal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cards-layout { grid-template-columns: 1fr; }
 }
 
@@ -274,6 +291,7 @@ button:disabled { opacity: .55; cursor: wait; }
   .planning-intro { min-height: 390px; padding: 25px; flex-direction: column; align-items: flex-start; justify-content: space-between; }
   .planning-actions { width: 100%; flex-direction: column; }
   .planning-actions button { width: 100%; }
+  .goal-grid { grid-template-columns: 1fr; }
   .credit-card-stage { min-height: 460px; }
   .physical-card { width: 84%; padding: 20px; }
   .invoice-panel { min-height: 480px; padding: 25px; }

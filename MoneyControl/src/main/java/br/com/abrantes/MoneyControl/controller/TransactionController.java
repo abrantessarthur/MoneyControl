@@ -7,7 +7,6 @@ import br.com.abrantes.MoneyControl.dto.response.UpdateTransactionResponse;
 import br.com.abrantes.MoneyControl.repository.TransactionSummary;
 import br.com.abrantes.MoneyControl.repository.TransactionsProjection;
 import br.com.abrantes.MoneyControl.service.TransactionalService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,6 @@ public class TransactionController {
     private final TransactionalService transactionService;
 
     @PostMapping
-    @Transactional
     public ResponseEntity<TransactionResponse> createTransaction(
             @Valid @RequestBody CreateTransactionRequest createTransactionRequest,
             Authentication authentication
@@ -38,27 +36,27 @@ public class TransactionController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
-        transactionService.delete(id);
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id, Authentication authentication) {
+        transactionService.delete(id, authentication);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{id}")
-    @Transactional
     public ResponseEntity<UpdateTransactionResponse>  updateTransaction(@PathVariable Long id,
-                                                                        @Valid @RequestBody UpdateTransactionRequest updateTransactionRequest) {
-        UpdateTransactionResponse updated = transactionService.update(updateTransactionRequest, id);
+                                                                        @Valid @RequestBody UpdateTransactionRequest updateTransactionRequest,
+                                                                        Authentication authentication) {
+        UpdateTransactionResponse updated = transactionService.update(updateTransactionRequest, id, authentication);
         return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/page/{page}/size/{size}")
-    public Page<TransactionsProjection> getAllTransactionsPageable(@PathVariable Integer page, @PathVariable Integer size){
-        return transactionService.getTransactionsPage(page, size);
+    public Page<TransactionsProjection> getAllTransactionsPageable(@PathVariable Integer page, @PathVariable Integer size, Authentication authentication) {
+        return transactionService.getTransactionsPage(page, size, authentication);
     }
 
     @GetMapping("/expensive")
-    public ResponseEntity<TransactionResponse> getMostExpensiveTransaction(){
-        return transactionService.getMostExpensiveTransaction()
+    public ResponseEntity<TransactionResponse> getMostExpensiveTransaction(Authentication authentication){
+        return transactionService.getMostExpensiveTransaction(authentication)
                 .map(transaction -> ResponseEntity.ok(transaction))
                 .orElse(ResponseEntity.noContent().build());
     }
@@ -73,8 +71,8 @@ public class TransactionController {
     }
 
     @GetMapping("/sumary")
-    public TransactionSummary getSumary(){
-        return transactionService.getSumary();
+    public TransactionSummary getSumary(Authentication authentication){
+        return transactionService.getSumary(authentication);
     }
 
 }

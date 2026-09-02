@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,26 +19,30 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody @Valid CategoryRequest categoryRequest) {
-        categoryService.create(categoryRequest);
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody @Valid CategoryRequest categoryRequest,
+                                                           Authentication authentication) {
+        categoryService.create(categoryRequest, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id){
-        categoryService.delete(id);
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id, Authentication authentication) {
+        categoryService.delete(id, authentication);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id,
-                                                           @RequestBody CategoryRequest categoryRequest){
-        categoryService.update(categoryRequest, id);
+                                                           @RequestBody CategoryRequest categoryRequest,
+                                                           Authentication authentication){
+        categoryService.update(categoryRequest, id, authentication);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/page/{page}/size/{size}")
-    public Page<CategorysProjection> getCategorysPage(@PathVariable Integer page, @PathVariable Integer size){
-        return categoryService.getCategorysPage(page, size);
+    public Page<CategorysProjection> getCategorysPage(@PathVariable Integer page,
+                                                      @PathVariable Integer size,
+                                                      Authentication authentication){
+        return categoryService.getCategorysPage(page, size, authentication);
     }
 }

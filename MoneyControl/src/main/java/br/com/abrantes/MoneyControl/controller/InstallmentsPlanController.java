@@ -6,7 +6,6 @@ import br.com.abrantes.MoneyControl.repository.InstallmenPlanProjection;
 import br.com.abrantes.MoneyControl.service.InstallmentPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +26,15 @@ public class InstallmentsPlanController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
-        installmentPlanService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication){
+        installmentPlanService.delete(id, authentication);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/page/{page}/size/{size}")
-    public Page<InstallmenPlanProjection> getInstallmentPage(@PathVariable Integer page, @PathVariable Integer size){
-        return  installmentPlanService.getInstallmentPage(page, size);
+    public Page<InstallmenPlanProjection> getInstallmentPage(@PathVariable Integer page, @PathVariable Integer size,
+                                                             Authentication authentication){
+        return  installmentPlanService.getInstallmentPage(page, size, authentication);
     }
 }
 

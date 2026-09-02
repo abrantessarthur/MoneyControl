@@ -13,8 +13,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
+
+    Optional<TransactionEntity> findByIdAndUserId(Long id, Long userId);
 
     boolean existsByRecurringTransactionIdAndRecurrenceReferenceDate(
             Long recurringTransactionId,
@@ -32,13 +35,16 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                    t.date as date
             FROM transactions t
             INNER JOIN categorys c ON c.id = t.category_id
+            WHERE t.user_id = :userId
+            ORDER BY t.date DESC
 """,
                     countQuery = """
                     SELECT COUNT(*)
                     FROM transactions t
+                    WHERE t.user_id = :userId
 """
             )
-    Page<TransactionsProjection> getTransactionsPage(Pageable pageable);
+    Page<TransactionsProjection> getTransactionsPage(@Param("userId") Long userId, Pageable pageable);
 
     @Query("""
     SELECT new br.com.abrantes.MoneyControl.dto.response.TransactionResponse(
@@ -51,9 +57,10 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         t.date
     )
     FROM TransactionEntity t
+    WHERE t.user.id = :userId
     ORDER BY t.amount DESC
 """)
-    List<TransactionResponse> findMostExpensiveTransaction(Pageable pageable);
+    List<TransactionResponse> findMostExpensiveTransaction(@Param("userId") Long userId, Pageable pageable);
 
     @Query("""
     SELECT COALESCE(
@@ -92,7 +99,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         COALESCE(SUM(CASE WHEN t.typeTransactional = br.com.abrantes.MoneyControl.enums.TypeTransactional.INCOME THEN t.amount ELSE 0 END), 0) AS totalIncome,
         COALESCE(SUM(CASE WHEN t.typeTransactional = br.com.abrantes.MoneyControl.enums.TypeTransactional.EXPENSE THEN t.amount ELSE 0 END), 0) AS totalExpense
     FROM TransactionEntity t
+    WHERE t.user.id = :userId
 """)
-    TransactionSummary getSumary();
+    TransactionSummary getSumary(@Param("userId") Long userId);
 
 }

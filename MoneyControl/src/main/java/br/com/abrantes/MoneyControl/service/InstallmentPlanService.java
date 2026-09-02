@@ -128,14 +128,16 @@ public class InstallmentPlanService {
         );
     }
 
-    public void delete(Long id){
-        if(!installmentPlanRepository.existsById(id)){
-            throw new NotFoundException("InstallmentPlan not found");
-        }
-        installmentPlanRepository.deleteById(id);
+    @Transactional
+    public void delete(Long id, Authentication authentication){
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        InstallmentPlanEntity plan = installmentPlanRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new NotFoundException("InstallmentPlan not found"));
+        installmentPlanRepository.delete(plan);
     }
 
-    public Page<InstallmenPlanProjection> getInstallmentPage(Integer page, Integer size){
-        return installmentPlanRepository.getInstallmentsPage(PageRequest.of(page, size));
+    public Page<InstallmenPlanProjection> getInstallmentPage(Integer page, Integer size, Authentication authentication){
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return installmentPlanRepository.getInstallmentsPage(user.getId(), PageRequest.of(page, size));
     }
 }

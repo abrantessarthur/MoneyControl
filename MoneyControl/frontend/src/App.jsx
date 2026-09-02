@@ -11,10 +11,12 @@ import {
   Layers3,
   LogOut,
   Menu,
+  Pencil,
   Plus,
   ReceiptText,
   Search,
   Target,
+  Trash2,
   WalletCards,
   X,
 } from "lucide-react";
@@ -40,6 +42,13 @@ const shortDate = new Intl.DateTimeFormat("pt-BR", {
   month: "short",
 });
 
+const fullDate = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
 const demoTransactions = [
   { id: 1, description: "Produto digital", amount: 3480, typeTransactional: "INCOME", categoryName: "Receita", date: "2026-08-29T09:00:00" },
   { id: 2, description: "Aluguel", amount: 1650, typeTransactional: "EXPENSE", categoryName: "Casa", date: "2026-08-27T08:30:00" },
@@ -57,6 +66,11 @@ const demoCategories = [
   { id: 5, name: "Saúde" },
 ];
 
+const demoGoals = [
+  { id: 1, description: "Reserva de emergência", amountToAchieve: 18000, amount: 7350, amountLeft: 10650, initialDate: "2026-06-01", finalDate: "2027-05-31" },
+  { id: 2, description: "Viagem de férias", amountToAchieve: 8500, amount: 5100, amountLeft: 3400, initialDate: "2026-07-15", finalDate: "2026-12-20" },
+];
+
 const flowData = [
   { day: "01", value: 2300 }, { day: "05", value: 2840 },
   { day: "09", value: 2410 }, { day: "13", value: 3080 },
@@ -70,6 +84,7 @@ const actionLabels = {
   budget: "Novo orçamento",
   installment: "Nova compra parcelada",
   card: "Novo cartão",
+  goal: "Nova meta financeira",
 };
 
 async function api(path, { token, body, method = "GET" } = {}) {
@@ -352,7 +367,7 @@ function TransactionsView({ transactions, onAction }) {
   );
 }
 
-function PlanningView({ installments, onAction, expense }) {
+function PlanningView({ installments, goals, onAction, onEditGoal, onDeleteGoal, expense }) {
   const items = installments.length ? installments : [
     { id: 1, description: "Notebook de trabalho", totalAmount: 5899, totalInstallments: 10, categoryId: 4 },
     { id: 2, description: "Cadeira ergonômica", totalAmount: 1740, totalInstallments: 6, categoryId: 2 },
@@ -361,7 +376,22 @@ function PlanningView({ installments, onAction, expense }) {
     <div className="planning-grid">
       <section className="planning-intro">
         <div><p className="eyebrow">PRÓXIMOS 90 DIAS</p><h2>O futuro também entra na conta.</h2><p>Transforme compromissos em decisões antes que eles virem surpresa.</p></div>
-        <div className="planning-actions"><button className="primary-button" onClick={() => onAction("installment")}><Plus size={16} /> Compra parcelada</button><button className="outline-button" onClick={() => onAction("budget")}><Target size={16} /> Orçamento</button></div>
+        <div className="planning-actions"><button className="primary-button" onClick={() => onAction("goal")}><Plus size={16} /> Meta financeira</button><button className="outline-button" onClick={() => onAction("installment")}><Plus size={16} /> Compra parcelada</button></div>
+      </section>
+      <section className="goals-board">
+        <div className="section-title"><div><span>METAS FINANCEIRAS</span><h3>Objetivos em andamento</h3></div><button className="icon-button" onClick={() => onAction("goal")} aria-label="Criar meta"><Plus size={18} /></button></div>
+        {goals.length ? <div className="goal-grid">{goals.map((goal) => {
+          const target = Number(goal.amountToAchieve);
+          const current = Number(goal.amount);
+          const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+          return <article className="goal-card" key={goal.id}>
+            <div className="goal-card-head"><span>{String(progress).padStart(2, "0")}%</span><div><button className="icon-button" onClick={() => onEditGoal(goal)} aria-label={`Editar ${goal.description}`}><Pencil size={14} /></button><button className="icon-button danger" onClick={() => onDeleteGoal(goal)} aria-label={`Excluir ${goal.description}`}><Trash2 size={14} /></button></div></div>
+            <h4>{goal.description}</h4>
+            <div className="goal-progress"><i style={{ width: `${progress}%` }} /></div>
+            <div className="goal-values"><span>Guardado<strong>{money.format(current)}</strong></span><span>Objetivo<strong>{money.format(target)}</strong></span></div>
+            <div className="goal-deadline"><CalendarDays size={14} /><span>Prazo</span><strong>{fullDate.format(new Date(`${goal.finalDate}T00:00:00Z`))}</strong></div>
+          </article>;
+        })}</div> : <EmptyState title="Nenhuma meta financeira" copy="Crie um objetivo e acompanhe seu progresso." />}
       </section>
       <section className="commitment-board">
         <div className="section-title"><div><span>PARCELAMENTOS ATIVOS</span><h3>Compromissos</h3></div><strong>{String(items.length).padStart(2, "0")}</strong></div>
@@ -405,10 +435,10 @@ function EmptyState({ title, copy }) {
   return <div className="empty-state"><WalletCards size={26} /><strong>{title}</strong><span>{copy}</span></div>;
 }
 
-function ActionSheet({ action, categories, onClose, onSubmit, busy }) {
+function ActionSheet({ action, categories, initialGoal, onClose, onSubmit, busy }) {
   const today = new Date().toISOString().slice(0, 10);
   const month = today.slice(0, 7);
-  const [form, setForm] = useState({ description: "", amount: "", typeTransactional: "EXPENSE", categoryId: categories[0]?.id || "", date: `${today}T12:00`, name: "", limitAmount: "", month, totalAmount: "", totalInstallments: 2, firstDueDate: today, lastFourDigits: "", creditLimit: "", closingDay: 10, dueDay: 17 });
+  const [form, setForm] = useState({ description: initialGoal?.description || "", amount: initialGoal?.amount ?? "", amountToAchieve: initialGoal?.amountToAchieve ?? "", finalDate: initialGoal?.finalDate || today, typeTransactional: "EXPENSE", categoryId: categories[0]?.id || "", date: `${today}T12:00`, name: "", limitAmount: "", month, totalAmount: "", totalInstallments: 2, firstDueDate: today, lastFourDigits: "", creditLimit: "", closingDay: 10, dueDay: 17 });
 
   function send(event) {
     event.preventDefault();
@@ -418,6 +448,7 @@ function ActionSheet({ action, categories, onClose, onSubmit, busy }) {
       budget: { limitAmount: Number(form.limitAmount), month: form.month, categoryId: Number(form.categoryId) },
       installment: { description: form.description, totalAmount: Number(form.totalAmount), totalInstallments: Number(form.totalInstallments), firstDueDate: form.firstDueDate, categoryId: Number(form.categoryId) },
       card: { name: form.name, lastFourDigits: form.lastFourDigits, creditLimit: Number(form.creditLimit), closingDay: Number(form.closingDay), dueDay: Number(form.dueDay) },
+      goal: { description: form.description, amountToAchieve: Number(form.amountToAchieve), amount: Number(form.amount), finalDate: form.finalDate },
     };
     onSubmit(action, payloads[action]);
   }
@@ -425,16 +456,17 @@ function ActionSheet({ action, categories, onClose, onSubmit, busy }) {
   return (
     <div className="sheet-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <aside className="action-sheet">
-        <div className="sheet-head"><div><span>NOVO REGISTRO</span><h2>{actionLabels[action]}</h2></div><button className="icon-button" onClick={onClose}><X size={20} /></button></div>
+        <div className="sheet-head"><div><span>{initialGoal ? "EDITAR REGISTRO" : "NOVO REGISTRO"}</span><h2>{initialGoal ? "Editar meta financeira" : actionLabels[action]}</h2></div><button className="icon-button" onClick={onClose}><X size={20} /></button></div>
         <form className="stack-form" onSubmit={send}>
-          {(action === "transaction" || action === "installment") && <label><span>Descrição</span><input required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Ex.: Mercado, notebook, salário" /></label>}
+          {(action === "transaction" || action === "installment" || action === "goal") && <label><span>Descrição</span><input required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={action === "goal" ? "Ex.: Reserva de emergência" : "Ex.: Mercado, notebook, salário"} /></label>}
           {(action === "category" || action === "card") && <label><span>{action === "card" ? "Nome do cartão" : "Nome da categoria"}</span><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={action === "card" ? "Ex.: Nubank principal" : "Ex.: Alimentação"} /></label>}
           {action === "transaction" && <><div className="form-grid"><label><span>Valor</span><input required type="number" min="0.01" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0,00" /></label><label><span>Tipo</span><select value={form.typeTransactional} onChange={(e) => setForm({ ...form, typeTransactional: e.target.value })}><option value="EXPENSE">Saída</option><option value="INCOME">Entrada</option></select></label></div><label><span>Data e hora</span><input type="datetime-local" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></label></>}
           {action === "budget" && <div className="form-grid"><label><span>Limite mensal</span><input required type="number" min="0.01" step="0.01" value={form.limitAmount} onChange={(e) => setForm({ ...form, limitAmount: e.target.value })} /></label><label><span>Mês</span><input required type="month" value={form.month} onChange={(e) => setForm({ ...form, month: e.target.value })} /></label></div>}
           {action === "installment" && <><div className="form-grid"><label><span>Valor total</span><input required type="number" min="0.01" step="0.01" value={form.totalAmount} onChange={(e) => setForm({ ...form, totalAmount: e.target.value })} /></label><label><span>Parcelas</span><input required type="number" min="2" value={form.totalInstallments} onChange={(e) => setForm({ ...form, totalInstallments: e.target.value })} /></label></div><label><span>Primeiro vencimento</span><input required type="date" value={form.firstDueDate} onChange={(e) => setForm({ ...form, firstDueDate: e.target.value })} /></label></>}
           {action === "card" && <><div className="form-grid"><label><span>Últimos 4 dígitos</span><input required inputMode="numeric" maxLength="4" value={form.lastFourDigits} onChange={(e) => setForm({ ...form, lastFourDigits: e.target.value.replace(/\D/g, "") })} placeholder="4821" /></label><label><span>Limite</span><input required type="number" min="0.01" step="0.01" value={form.creditLimit} onChange={(e) => setForm({ ...form, creditLimit: e.target.value })} /></label></div><div className="form-grid"><label><span>Dia de fechamento</span><input required type="number" min="1" max="31" value={form.closingDay} onChange={(e) => setForm({ ...form, closingDay: e.target.value })} /></label><label><span>Dia de vencimento</span><input required type="number" min="1" max="31" value={form.dueDay} onChange={(e) => setForm({ ...form, dueDay: e.target.value })} /></label></div></>}
+          {action === "goal" && <><div className="form-grid"><label><span>Valor atual</span><input required type="number" min="0" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></label><label><span>Valor objetivo</span><input required type="number" min="0.01" step="0.01" value={form.amountToAchieve} onChange={(e) => setForm({ ...form, amountToAchieve: e.target.value })} /></label></div><label><span>Data final</span><input required type="date" min={today} value={form.finalDate} onChange={(e) => setForm({ ...form, finalDate: e.target.value })} /></label></>}
           {(action === "transaction" || action === "budget" || action === "installment") && <label><span>Categoria</span><select required value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}><option value="" disabled>Selecione</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>}
-          <div className="sheet-note"><span>INFO</span><p>{action === "installment" ? "As parcelas serão lançadas automaticamente como despesas mensais." : "O registro será enviado diretamente para sua API Money Control."}</p></div>
+          <div className="sheet-note"><span>INFO</span><p>{action === "installment" ? "As parcelas serão lançadas automaticamente como despesas mensais." : action === "goal" ? "O valor atual não pode ultrapassar o valor objetivo." : "O registro será enviado diretamente para sua API Money Control."}</p></div>
           <button className="primary-button wide" disabled={busy}>{busy ? "Salvando…" : "Confirmar registro"}<ArrowRight size={17} /></button>
         </form>
       </aside>
@@ -448,24 +480,26 @@ export default function App() {
   const [view, setView] = useState("overview");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [action, setAction] = useState(null);
+  const [editingGoal, setEditingGoal] = useState(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
-  const [data, setData] = useState({ balance: 0, income: 0, expense: 0, transactions: [], categories: [], installments: [] });
+  const [data, setData] = useState({ balance: 0, income: 0, expense: 0, transactions: [], categories: [], installments: [], goals: [] });
 
-  const demoData = useMemo(() => ({ balance: 5387.36, income: 10420, expense: 5032.64, transactions: demoTransactions, categories: demoCategories, installments: [] }), []);
+  const demoData = useMemo(() => ({ balance: 5387.36, income: 10420, expense: 5032.64, transactions: demoTransactions, categories: demoCategories, installments: [], goals: demoGoals }), []);
 
   const load = useCallback(async () => {
     if (!session) return;
     if (session.demo) { setData(demoData); return; }
     try {
-      const [balance, summary, transactions, categories, installments] = await Promise.all([
+      const [balance, summary, transactions, categories, installments, goals] = await Promise.all([
         api("/transactions/balance", { token: session.token }),
         api("/transactions/sumary", { token: session.token }),
         api("/transactions/page/0/size/20", { token: session.token }),
         api("/categorys/page/0/size/50", { token: session.token }),
         api("/installments/page/0/size/10", { token: session.token }),
+        api("/goals", { token: session.token }),
       ]);
-      setData({ balance: Number(balance || 0), income: Number(summary?.totalIncome || 0), expense: Number(summary?.totalExpense || 0), transactions: transactions?.content || [], categories: categories?.content || [], installments: installments?.content || [] });
+      setData({ balance: Number(balance || 0), income: Number(summary?.totalIncome || 0), expense: Number(summary?.totalExpense || 0), transactions: transactions?.content || [], categories: categories?.content || [], installments: installments?.content || [], goals: goals || [] });
     } catch (reason) {
       if (reason.message === "UNAUTHORIZED") {
         localStorage.removeItem("mc_token");
@@ -487,12 +521,35 @@ export default function App() {
 
   async function submitAction(type, body) {
     if (session.demo) { setNotice("No modo demo, os registros não são enviados."); setAction(null); return; }
-    const routes = { transaction: "/transactions", category: "/categorys", budget: "/budget", installment: "/installments", card: "/credit" };
+    const routes = { transaction: "/transactions", category: "/categorys", budget: "/budget", installment: "/installments", card: "/credit", goal: "/goals" };
     setBusy(true);
     try {
-      await api(routes[type], { token: session.token, method: "POST", body });
+      const goalUpdate = type === "goal" && editingGoal;
+      await api(goalUpdate ? `/goals/${editingGoal.id}` : routes[type], { token: session.token, method: goalUpdate ? "PUT" : "POST", body });
       setNotice("Registro salvo com sucesso.");
       setAction(null);
+      setEditingGoal(null);
+      await load();
+    } catch (reason) {
+      setNotice(reason.message === "UNAUTHORIZED" ? "Sua sessão expirou. Entre novamente." : reason.message);
+      if (reason.message === "UNAUTHORIZED") logout();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function editGoal(goal) {
+    setEditingGoal(goal);
+    setAction("goal");
+  }
+
+  async function deleteGoal(goal) {
+    if (session.demo) { setNotice("No modo demo, as metas não são alteradas."); return; }
+    if (!window.confirm(`Excluir a meta “${goal.description}”?`)) return;
+    setBusy(true);
+    try {
+      await api(`/goals/${goal.id}`, { token: session.token, method: "DELETE" });
+      setNotice("Meta excluída com sucesso.");
       await load();
     } catch (reason) {
       setNotice(reason.message === "UNAUTHORIZED" ? "Sua sessão expirou. Entre novamente." : reason.message);
@@ -513,11 +570,11 @@ export default function App() {
         <main className="content">
           {view === "overview" && <Overview data={data} onAction={setAction} />}
           {view === "transactions" && <TransactionsView transactions={data.transactions} onAction={setAction} />}
-          {view === "planning" && <PlanningView installments={data.installments} expense={data.expense} onAction={setAction} />}
+          {view === "planning" && <PlanningView installments={data.installments} goals={data.goals} expense={data.expense} onAction={(next) => { setEditingGoal(null); setAction(next); }} onEditGoal={editGoal} onDeleteGoal={deleteGoal} />}
           {view === "cards" && <CardsView onAction={setAction} />}
         </main>
       </div>
-      {action && <ActionSheet action={action} categories={data.categories} onClose={() => setAction(null)} onSubmit={submitAction} busy={busy} />}
+      {action && <ActionSheet action={action} categories={data.categories} initialGoal={editingGoal} onClose={() => { setAction(null); setEditingGoal(null); }} onSubmit={submitAction} busy={busy} />}
       {notice && <div className="toast"><span />{notice}</div>}
     </div>
   );
