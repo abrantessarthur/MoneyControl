@@ -30,14 +30,12 @@ public class MonthlyBudgetService {
             CreateMonthlyBudgetRequest request,
             Authentication authentication
     ) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
         CategoryEntity category = categoryRepository
-                .findById(request.categoryId())
+                .findByIdAndUserId(request.categoryId(), user.getId())
                 .orElseThrow(() ->
                         new NotFoundException("Category not found")
                 );
-
-        UserEntity user = (UserEntity) authentication.getPrincipal();
-
         MonthlyBudgetEntity budget = MonthlyBudgetEntity.builder()
                 .limitAmount(request.limitAmount())
                 .month(request.month())

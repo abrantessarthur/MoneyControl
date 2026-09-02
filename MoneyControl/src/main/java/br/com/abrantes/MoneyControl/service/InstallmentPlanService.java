@@ -40,7 +40,7 @@ public class InstallmentPlanService {
         UserEntity user = (UserEntity) authentication.getPrincipal();
 
         CategoryEntity category = categoryRepository
-                .findById(request.categoryId())
+                .findByIdAndUserId(request.categoryId(), user.getId())
                 .orElseThrow(() ->
                         new NotFoundException("Category not found")
                 );

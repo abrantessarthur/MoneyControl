@@ -27,4 +27,6 @@ public interface CategoryRepository extends CrudRepository<CategoryEntity, Long>
     Page<CategorysProjection> getCategorysPage(@Param("userId") Long userId, Pageable pageable);
 
     Optional<CategoryEntity> findByIdAndUserId(Long id, Long userId);
+
+
 }

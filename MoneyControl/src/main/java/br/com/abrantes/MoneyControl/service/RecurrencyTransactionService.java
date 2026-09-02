@@ -38,7 +38,7 @@ public class RecurrencyTransactionService {
             CreateRecurrencyTransaction request
     ) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
-        CategoryEntity category = categoryRepository.findById(request.categoryId())
+        CategoryEntity category = categoryRepository.findByIdAndUserId(request.categoryId(), user.getId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
         if (request.endDate() != null && request.endDate().isBefore(request.startDate())) {
