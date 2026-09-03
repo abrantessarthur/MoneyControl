@@ -103,4 +103,5 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 """)
     TransactionSummary getSumary(@Param("userId") Long userId);
 
+    boolean existsByCategoryId(Long categoryId);
 }

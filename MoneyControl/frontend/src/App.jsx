@@ -336,7 +336,7 @@ function BudgetDial({ expense, onAction }) {
   );
 }
 
-function TransactionsView({ transactions, onAction }) {
+function TransactionsView({ transactions, onAction, onDeleteTransaction }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("ALL");
   const filtered = transactions.filter((item) => {
@@ -355,10 +355,10 @@ function TransactionsView({ transactions, onAction }) {
         <button className="outline-button" onClick={() => onAction("category")}><Plus size={16} /> Categoria</button>
       </section>
       <section className="table-shell">
-        <div className="table-head"><span>DESCRIÇÃO</span><span>CATEGORIA</span><span>DATA</span><span>TIPO</span><span>VALOR</span></div>
+        <div className="table-head"><span>DESCRIÇÃO</span><span>CATEGORIA</span><span>DATA</span><span>TIPO</span><span>VALOR</span><span>AÇÕES</span></div>
         {filtered.map((item) => (
           <div className="table-row" key={item.id}>
-            <strong>{item.description}</strong><span>{item.categoryName || "—"}</span><span>{shortDate.format(new Date(item.date))}</span><span className="type-label">{item.typeTransactional === "INCOME" ? "ENTRADA" : "SAÍDA"}</span><strong className={item.typeTransactional === "INCOME" ? "positive" : ""}>{item.typeTransactional === "INCOME" ? "+" : "−"}{money.format(Number(item.amount))}</strong>
+            <strong>{item.description}</strong><span>{item.categoryName || "—"}</span><span>{shortDate.format(new Date(item.date))}</span><span className="type-label">{item.typeTransactional === "INCOME" ? "ENTRADA" : "SAÍDA"}</span><strong className={item.typeTransactional === "INCOME" ? "positive" : ""}>{item.typeTransactional === "INCOME" ? "+" : "−"}{money.format(Number(item.amount))}</strong><button className="icon-button danger transaction-delete" onClick={() => onDeleteTransaction(item)} aria-label={`Excluir ${item.description}`}><Trash2 size={14} /></button>
           </div>
         ))}
         {!filtered.length && <EmptyState title="Nada encontrado" copy="Mude o filtro ou crie uma movimentação." />}
@@ -435,7 +435,7 @@ function EmptyState({ title, copy }) {
   return <div className="empty-state"><WalletCards size={26} /><strong>{title}</strong><span>{copy}</span></div>;
 }
 
-function ActionSheet({ action, categories, initialGoal, onClose, onSubmit, busy }) {
+function ActionSheet({ action, categories, initialGoal, onClose, onSubmit, onDeleteCategory, busy }) {
   const today = new Date().toISOString().slice(0, 10);
   const month = today.slice(0, 7);
   const [form, setForm] = useState({ description: initialGoal?.description || "", amount: initialGoal?.amount ?? "", amountToAchieve: initialGoal?.amountToAchieve ?? "", finalDate: initialGoal?.finalDate || today, typeTransactional: "EXPENSE", categoryId: categories[0]?.id || "", date: `${today}T12:00`, name: "", limitAmount: "", month, totalAmount: "", totalInstallments: 2, firstDueDate: today, lastFourDigits: "", creditLimit: "", closingDay: 10, dueDay: 17 });
@@ -466,6 +466,13 @@ function ActionSheet({ action, categories, initialGoal, onClose, onSubmit, busy 
           {action === "card" && <><div className="form-grid"><label><span>Últimos 4 dígitos</span><input required inputMode="numeric" maxLength="4" value={form.lastFourDigits} onChange={(e) => setForm({ ...form, lastFourDigits: e.target.value.replace(/\D/g, "") })} placeholder="4821" /></label><label><span>Limite</span><input required type="number" min="0.01" step="0.01" value={form.creditLimit} onChange={(e) => setForm({ ...form, creditLimit: e.target.value })} /></label></div><div className="form-grid"><label><span>Dia de fechamento</span><input required type="number" min="1" max="31" value={form.closingDay} onChange={(e) => setForm({ ...form, closingDay: e.target.value })} /></label><label><span>Dia de vencimento</span><input required type="number" min="1" max="31" value={form.dueDay} onChange={(e) => setForm({ ...form, dueDay: e.target.value })} /></label></div></>}
           {action === "goal" && <><div className="form-grid"><label><span>Valor atual</span><input required type="number" min="0" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></label><label><span>Valor objetivo</span><input required type="number" min="0.01" step="0.01" value={form.amountToAchieve} onChange={(e) => setForm({ ...form, amountToAchieve: e.target.value })} /></label></div><label><span>Data final</span><input required type="date" min={today} value={form.finalDate} onChange={(e) => setForm({ ...form, finalDate: e.target.value })} /></label></>}
           {(action === "transaction" || action === "budget" || action === "installment") && <label><span>Categoria</span><select required value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}><option value="" disabled>Selecione</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>}
+          {action === "category" && <section className="category-manager">
+            <div className="category-manager-head"><span>CATEGORIAS ATUAIS</span><strong>{String(categories.length).padStart(2, "0")}</strong></div>
+            {categories.length ? <div className="category-manager-list">{categories.map((category) => <div className="category-manager-row" key={category.id}>
+              <span>{category.name}</span>
+              <button type="button" className="icon-button danger" onClick={() => onDeleteCategory(category)} disabled={busy} aria-label={`Excluir ${category.name}`}><Trash2 size={14} /></button>
+            </div>)}</div> : <p className="category-manager-empty">Nenhuma categoria cadastrada.</p>}
+          </section>}
           <div className="sheet-note"><span>INFO</span><p>{action === "installment" ? "As parcelas serão lançadas automaticamente como despesas mensais." : action === "goal" ? "O valor atual não pode ultrapassar o valor objetivo." : "O registro será enviado diretamente para sua API Money Control."}</p></div>
           <button className="primary-button wide" disabled={busy}>{busy ? "Salvando…" : "Confirmar registro"}<ArrowRight size={17} /></button>
         </form>
@@ -559,6 +566,38 @@ export default function App() {
     }
   }
 
+  async function deleteCategory(category) {
+    if (session.demo) { setNotice("No modo demo, as categorias não são alteradas."); return; }
+    if (!window.confirm(`Excluir a categoria “${category.name}”?`)) return;
+    setBusy(true);
+    try {
+      await api(`/categorys/${category.id}`, { token: session.token, method: "DELETE" });
+      setNotice("Categoria excluída com sucesso.");
+      await load();
+    } catch (reason) {
+      setNotice(reason.message === "UNAUTHORIZED" ? "Sua sessão expirou. Entre novamente." : reason.message);
+      if (reason.message === "UNAUTHORIZED") logout();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function deleteTransaction(transaction) {
+    if (session.demo) { setNotice("No modo demo, as movimentações não são alteradas."); return; }
+    if (!window.confirm(`Excluir a movimentação “${transaction.description}”?`)) return;
+    setBusy(true);
+    try {
+      await api(`/transactions/${transaction.id}`, { token: session.token, method: "DELETE" });
+      setNotice("Movimentação excluída com sucesso.");
+      await load();
+    } catch (reason) {
+      setNotice(reason.message === "UNAUTHORIZED" ? "Sua sessão expirou. Entre novamente." : reason.message);
+      if (reason.message === "UNAUTHORIZED") logout();
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (!session) return <Login onSession={setSession} />;
 
   return (
@@ -569,12 +608,12 @@ export default function App() {
         <Header view={view} onAction={setAction} openMenu={() => setMobileOpen(true)} offline={session.demo} />
         <main className="content">
           {view === "overview" && <Overview data={data} onAction={setAction} />}
-          {view === "transactions" && <TransactionsView transactions={data.transactions} onAction={setAction} />}
+          {view === "transactions" && <TransactionsView transactions={data.transactions} onAction={setAction} onDeleteTransaction={deleteTransaction} />}
           {view === "planning" && <PlanningView installments={data.installments} goals={data.goals} expense={data.expense} onAction={(next) => { setEditingGoal(null); setAction(next); }} onEditGoal={editGoal} onDeleteGoal={deleteGoal} />}
           {view === "cards" && <CardsView onAction={setAction} />}
         </main>
       </div>
-      {action && <ActionSheet action={action} categories={data.categories} initialGoal={editingGoal} onClose={() => { setAction(null); setEditingGoal(null); }} onSubmit={submitAction} busy={busy} />}
+      {action && <ActionSheet action={action} categories={data.categories} initialGoal={editingGoal} onClose={() => { setAction(null); setEditingGoal(null); }} onSubmit={submitAction} onDeleteCategory={deleteCategory} busy={busy} />}
       {notice && <div className="toast"><span />{notice}</div>}
     </div>
   );

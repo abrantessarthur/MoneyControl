@@ -28,4 +28,6 @@ public interface RecurrencyTransactionRepository extends JpaRepository<Recurring
     List<RecurringTransactionEntity> findAllByUserIdOrderByNextExecutionDateAsc(Long userId);
 
     Optional<RecurringTransactionEntity> findByIdAndUserId(Long id, Long userId);
+
+    boolean existsByCategoryId(Long categoryId);
 }

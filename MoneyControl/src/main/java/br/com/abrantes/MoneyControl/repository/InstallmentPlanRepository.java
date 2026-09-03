@@ -30,4 +30,5 @@ public interface InstallmentPlanRepository extends JpaRepository<InstallmentPlan
 """
             )
     Page<InstallmenPlanProjection> getInstallmentsPage(@Param("userId") Long userId, Pageable pageable);
+    boolean existsByCategoryId(Long categoryId);
 }

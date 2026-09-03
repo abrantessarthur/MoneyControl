@@ -77,9 +77,6 @@ public class TransactionalService {
 
     @Transactional
     public void delete(Long id, Authentication authentication) {
-        if (categoryRepository.existsById(id)) {
-            throw new BadRequestException("There is a category vinculated with this transaction, you can't delete");
-        }
         TransactionEntity transaction = findOwnedTransaction(id, authentication);
         transactionRepository.delete(transaction);
     }

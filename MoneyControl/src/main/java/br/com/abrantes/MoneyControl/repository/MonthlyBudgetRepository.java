@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface MonthlyBudgetRepository extends JpaRepository<MonthlyBudgetEntity, Long> {
     Optional<MonthlyBudgetEntity> findByIdAndUserId(Long id, Long userId);
+    boolean existsByCategoryId(Long categoryId);
 }
