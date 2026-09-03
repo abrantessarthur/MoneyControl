@@ -12,11 +12,9 @@ public record CreateTransactionRequest(
         String description,
         @NotNull
         BigDecimal amount,
-        @NotBlank
         TypeTransactional typeTransactional,
         @NotNull
         Long categoryId,
-        @NotBlank
         LocalDateTime date
 ) {
 }

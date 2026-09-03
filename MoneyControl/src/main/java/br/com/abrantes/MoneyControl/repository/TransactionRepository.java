@@ -103,5 +103,4 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 """)
     TransactionSummary getSumary(@Param("userId") Long userId);
 
-    Boolean existsCategoryVinculatedWithTransaction(Long categoryId, Long transactionId);
 }
