@@ -4,6 +4,7 @@ import br.com.abrantes.MoneyControl.dto.request.CreateMonthlyBudgetRequest;
 import br.com.abrantes.MoneyControl.dto.response.BudgetSummaryResponse;
 import br.com.abrantes.MoneyControl.dto.response.MonthlyBudgetResponse;
 import br.com.abrantes.MoneyControl.entity.CategoryEntity;
+import br.com.abrantes.MoneyControl.entity.CreditCardEntity;
 import br.com.abrantes.MoneyControl.entity.MonthlyBudgetEntity;
 import br.com.abrantes.MoneyControl.entity.UserEntity;
 import br.com.abrantes.MoneyControl.exception.NotFoundException;
@@ -101,10 +102,14 @@ public class MonthlyBudgetService {
         );
     }
 
-    public void delete(Long id) {
-        if(!budgetRepository.existsById(id)){
-            throw new NotFoundException("Budget Not Found");
-        }
-        budgetRepository.deleteById(id);
+    public void delete(Long id, Authentication authentication) {
+        MonthlyBudgetEntity monthlyBudgetEntity = findOwnedMonthlyBudget(id, authentication);
+        budgetRepository.delete(monthlyBudgetEntity);
+    }
+
+    private MonthlyBudgetEntity findOwnedMonthlyBudget(Long id, Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return budgetRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new NotFoundException("Monthly Budget not found"));
     }
 }
