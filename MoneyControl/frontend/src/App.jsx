@@ -502,7 +502,7 @@ export default function App() {
         api("/transactions/balance", { token: session.token }),
         api("/transactions/sumary", { token: session.token }),
         api("/transactions/page/0/size/20", { token: session.token }),
-        api("/categorys/page/0/size/50", { token: session.token }),
+        api("/categories/page/0/size/50", { token: session.token }),
         api("/installments/page/0/size/10", { token: session.token }),
         api("/goals", { token: session.token }),
       ]);
@@ -528,7 +528,7 @@ export default function App() {
 
   async function submitAction(type, body) {
     if (session.demo) { setNotice("No modo demo, os registros não são enviados."); setAction(null); return; }
-    const routes = { transaction: "/transactions", category: "/categorys", budget: "/budget", installment: "/installments", card: "/credit", goal: "/goals" };
+    const routes = { transaction: "/transactions", category: "/categories", budget: "/budget", installment: "/installments", card: "/credit", goal: "/goals" };
     setBusy(true);
     try {
       const goalUpdate = type === "goal" && editingGoal;
@@ -571,7 +571,7 @@ export default function App() {
     if (!window.confirm(`Excluir a categoria “${category.name}”?`)) return;
     setBusy(true);
     try {
-      await api(`/categorys/${category.id}`, { token: session.token, method: "DELETE" });
+      await api(`/categories/${category.id}`, { token: session.token, method: "DELETE" });
       setNotice("Categoria excluída com sucesso.");
       await load();
     } catch (reason) {

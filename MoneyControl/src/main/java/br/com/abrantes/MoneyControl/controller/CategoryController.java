@@ -2,7 +2,7 @@ package br.com.abrantes.MoneyControl.controller;
 
 import br.com.abrantes.MoneyControl.dto.request.CategoryRequest;
 import br.com.abrantes.MoneyControl.dto.response.CategoryResponse;
-import br.com.abrantes.MoneyControl.repository.CategorysProjection;
+import br.com.abrantes.MoneyControl.repository.CategoriesProjection;
 import br.com.abrantes.MoneyControl.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/categorys")
+@RequestMapping("/categories")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -41,9 +41,9 @@ public class CategoryController {
     }
 
     @GetMapping("/page/{page}/size/{size}")
-    public Page<CategorysProjection> getCategorysPage(@PathVariable Integer page,
+    public Page<CategoriesProjection> getCategoriesPage(@PathVariable Integer page,
                                                       @PathVariable Integer size,
                                                       Authentication authentication){
-        return categoryService.getCategorysPage(page, size, authentication);
+        return categoryService.getCategoriesPage(page, size, authentication);
     }
 }
