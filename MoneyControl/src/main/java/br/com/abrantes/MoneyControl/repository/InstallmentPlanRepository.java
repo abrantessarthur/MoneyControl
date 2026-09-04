@@ -20,7 +20,7 @@ public interface InstallmentPlanRepository extends JpaRepository<InstallmentPlan
                    i.total_installments as totalInstallments,
                    c.id as categoryId
             FROM installment_plans i
-            INNER JOIN categorys c ON c.id = i.category_id
+            INNER JOIN categories c ON c.id = i.category_id
             WHERE i.user_id = :userId
 """,
                     countQuery = """

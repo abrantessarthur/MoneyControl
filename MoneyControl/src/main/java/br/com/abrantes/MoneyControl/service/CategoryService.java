@@ -3,8 +3,6 @@ package br.com.abrantes.MoneyControl.service;
 import br.com.abrantes.MoneyControl.dto.request.CategoryRequest;
 import br.com.abrantes.MoneyControl.dto.response.CategoryResponse;
 import br.com.abrantes.MoneyControl.entity.CategoryEntity;
-import br.com.abrantes.MoneyControl.entity.RecurringTransactionEntity;
-import br.com.abrantes.MoneyControl.entity.TransactionEntity;
 import br.com.abrantes.MoneyControl.entity.UserEntity;
 import br.com.abrantes.MoneyControl.exception.BadRequestException;
 import br.com.abrantes.MoneyControl.exception.NotFoundException;
@@ -15,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -63,9 +59,9 @@ public class CategoryService {
                 saved.getName());
     }
 
-    public Page<CategorysProjection> getCategorysPage(Integer page, Integer size, Authentication authentication){
+    public Page<CategoriesProjection> getCategoriesPage(Integer page, Integer size, Authentication authentication){
         UserEntity user = (UserEntity) authentication.getPrincipal();
-        return categoryRepository.getCategorysPage(user.getId(), PageRequest.of(page, size));
+        return categoryRepository.getCategoriesPage(user.getId(), PageRequest.of(page, size));
     }
     private CategoryEntity findOwnedCategory(Long id, Authentication authentication) {
         UserEntity user = (UserEntity) authentication.getPrincipal();

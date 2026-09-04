@@ -69,7 +69,7 @@ class AuthenticationServiceTest {
         verify(userRepository, times(1)).save(captor.capture());
 
         UserEntity salvo = captor.getValue();
-        assertEquals("joao", salvo.getUsername());
+        assertEquals("joao", salvo.getDisplayName());
         assertEquals("joao@email.com", salvo.getEmail());
         assertEquals("hash_senha123", salvo.getPassword());
         assertTrue(salvo.getRoles().contains(roleUser));

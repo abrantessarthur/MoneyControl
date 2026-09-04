@@ -2,6 +2,7 @@ package br.com.abrantes.MoneyControl;
 
 import br.com.abrantes.MoneyControl.dto.request.CreateTransactionRequest;
 import br.com.abrantes.MoneyControl.entity.CategoryEntity;
+import br.com.abrantes.MoneyControl.entity.UserEntity;
 import br.com.abrantes.MoneyControl.enums.TypeTransactional;
 import br.com.abrantes.MoneyControl.exception.BadRequestException;
 import br.com.abrantes.MoneyControl.exception.NotFoundException;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.when;
     @Mock private Authentication authentication;
 
     private TransactionalService transactionService;
+    private UserEntity user;
 
     @BeforeEach
     void setUp() {
@@ -41,6 +43,8 @@ import static org.mockito.Mockito.when;
                 transactionRepository,
                 categoryRepository
         );
+        user = UserEntity.builder().id(10L).build();
+        when(authentication.getPrincipal()).thenReturn(user);
     }
 
     @Test
@@ -48,7 +52,7 @@ import static org.mockito.Mockito.when;
     void naoDeveRegistrarQuandoNaoAcharUmaCategoria(){
         CreateTransactionRequest create = new CreateTransactionRequest("testando123", new BigDecimal("123400.00"), TypeTransactional.EXPENSE, 0L, LocalDateTime.parse("2026-08-17T13:18:38"));
 
-        when(categoryRepository.findById(0L)).thenReturn(Optional.empty());
+        when(categoryRepository.findByIdAndUserId(0L, user.getId())).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -68,7 +72,7 @@ import static org.mockito.Mockito.when;
                 .name("Test category")
                 .build();
 
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.findByIdAndUserId(1L, user.getId())).thenReturn(Optional.of(category));
 
         BadRequestException exception = assertThrows(
                 BadRequestException.class,

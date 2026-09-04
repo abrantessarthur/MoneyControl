@@ -34,7 +34,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                    c.name as categoryName,
                    t.date as date
             FROM transactions t
-            INNER JOIN categorys c ON c.id = t.category_id
+            INNER JOIN categories c ON c.id = t.category_id
             WHERE t.user_id = :userId
             ORDER BY t.date DESC
 """,
@@ -102,6 +102,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     WHERE t.user.id = :userId
 """)
     TransactionSummary getSumary(@Param("userId") Long userId);
+
 
     boolean existsByCategoryId(Long categoryId);
 }
