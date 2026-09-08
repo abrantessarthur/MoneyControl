@@ -10,19 +10,19 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface CategoryRepository extends CrudRepository<CategoryEntity, Long> {
-    @NativeQuery
-            (value = """
-            SELECT c.id as id,
-                   c.name as name
-            FROM categories c
-            WHERE c.user_id = :userId
-""",
-                    countQuery = """
+    @NativeQuery(
+            value = """
+                    SELECT c.id AS id, c.name AS name
+                    FROM categories c
+                    WHERE c.user_id = :userId
+                    ORDER BY c.name
+                    """,
+            countQuery = """
                     SELECT COUNT(*)
                     FROM categories c
                     WHERE c.user_id = :userId
-"""
-            )
+                    """
+    )
     Page<CategoriesProjection> getCategoriesPage(@Param("userId") Long userId, Pageable pageable);
 
     Optional<CategoryEntity> findByIdAndUserId(Long id, Long userId);

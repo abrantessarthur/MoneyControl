@@ -29,7 +29,7 @@ public class InstallmentsPlanController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication){
         installmentPlanService.delete(id, authentication);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/page/{page}/size/{size}")

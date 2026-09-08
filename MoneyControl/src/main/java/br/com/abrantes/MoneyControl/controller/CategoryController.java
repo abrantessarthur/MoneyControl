@@ -42,8 +42,9 @@ public class CategoryController {
 
     @GetMapping("/page/{page}/size/{size}")
     public Page<CategoriesProjection> getCategoriesPage(@PathVariable Integer page,
-                                                      @PathVariable Integer size,
-                                                      Authentication authentication){
+                                                        @PathVariable Integer size,
+                                                        Authentication authentication){
         return categoryService.getCategoriesPage(page, size, authentication);
     }
+
 }

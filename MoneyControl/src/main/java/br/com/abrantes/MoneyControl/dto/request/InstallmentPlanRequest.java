@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record InstallmentPlanRequest(
+        @NotBlank
         String description,
         @NotNull @Positive
         BigDecimal totalAmount,

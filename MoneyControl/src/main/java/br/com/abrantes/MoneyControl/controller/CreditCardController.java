@@ -24,8 +24,8 @@ public class CreditCardController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
-        creditCardService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication){
+        creditCardService.delete(id, authentication);
         return ResponseEntity.noContent().build();
     }
 

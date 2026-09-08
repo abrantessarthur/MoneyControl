@@ -3,4 +3,15 @@
   <component name="AdditionalModuleElements">
     <content url="file://$MODULE_DIR$" />
   </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_21" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/MoneyControl">
+      <sourceFolder url="file://$MODULE_DIR$/MoneyControl/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/MoneyControl/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/MoneyControl/src/test/java" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/MoneyControl/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
 </module>

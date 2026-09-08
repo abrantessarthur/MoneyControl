@@ -12,8 +12,8 @@ public record CreateTransactionRequest(
         String description,
         @NotNull
         BigDecimal amount,
-        TypeTransactional typeTransactional,
         @NotNull
+        TypeTransactional typeTransactional,
         Long categoryId,
         LocalDateTime date
 ) {

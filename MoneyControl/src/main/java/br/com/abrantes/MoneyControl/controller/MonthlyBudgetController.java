@@ -32,4 +32,10 @@ public class MonthlyBudgetController {
     ) {
         return ResponseEntity.ok(monthlyBudgetService.getSummary(budgetId, authentication));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
+        monthlyBudgetService.delete(id, authentication);
+        return ResponseEntity.noContent().build();
+    }
 }

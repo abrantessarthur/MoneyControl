@@ -42,9 +42,7 @@ public class CategoryService {
         CategoryEntity category = findOwnedCategory(id, authentication);
         if (transactionRepository.existsByCategoryId(id) || recurrencyTransactionRepository.existsByCategoryId(id)
                 || monthlyBudgetRepository.existsByCategoryId(id) || installmentPlanRepository.existsByCategoryId(id)) {
-            throw new BadRequestException("There is something vinculated with this category");
-        }if (!categoryRepository.existsById(id)) {
-            throw new NotFoundException("Category not found");
+            throw new BadRequestException("Category is linked to another resource");
         }
         categoryRepository.delete(category);
     }
@@ -63,6 +61,7 @@ public class CategoryService {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         return categoryRepository.getCategoriesPage(user.getId(), PageRequest.of(page, size));
     }
+
     private CategoryEntity findOwnedCategory(Long id, Authentication authentication) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         return categoryRepository.findByIdAndUserId(id, user.getId())
